@@ -12,13 +12,13 @@ app.use(cors());
 app.use(express.json());
 
 // Rotas de Autenticação
-app.post('/register', authController.register);
-app.post('/login', authController.login);
+app.post('/register', authController.register);  // Aqui está correto
+app.post('/login', authController.login);        // Aqui está correto
 
 // Rotas de Produtos
 app.use('/products', productRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}` );
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
