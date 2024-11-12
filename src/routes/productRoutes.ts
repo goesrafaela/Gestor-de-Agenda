@@ -1,17 +1,18 @@
 import { Router } from 'express';
-import Product from '../models/Product';
+import { createProduct, getAllProducts, deleteProduct, updateProduct } from '../controllers/productController';
 
 const router = Router();
 
-router.get('/', async (req, res) => {
-  const products = await Product.findAll();
-  res.json(products);
-});
+// Rota para criar um novo produto
+router.post('/', createProduct);
 
-router.post('/', async (req, res) => {
-  const { name, price, stock } = req.body;
-  const product = await Product.create({ name, price, stock });
-  res.status(201).json(product);
-});
+// Rota para listar todos os produtos
+router.get('/', getAllProducts);
+
+// Rota para atualizar um produto pelo ID
+router.put('/:id', updateProduct);
+
+// Rota para deletar um produto pelo ID
+router.delete('/:id', deleteProduct);
 
 export default router;
