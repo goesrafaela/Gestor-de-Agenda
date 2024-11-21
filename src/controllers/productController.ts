@@ -5,7 +5,19 @@ const prisma = new PrismaClient();
 
 // Adicionar um novo produto
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
-  const { name, description, price, userId, stock } = req.body;
+  const { name, description, price, stock, userId } = req.body;
+
+  // Verifica se o produto já existe
+  const existingProduct = await prisma.product.findFirst({
+    where: {
+      name: name,  // Verifique se já existe um produto com o mesmo nome
+    },
+  });
+
+  if (existingProduct) {
+    res.status(400).json({ error: 'Produto com este nome já existe.' });
+    return;
+  }
 
   if (stock == null) {
     res.status(400).json({ error: 'O campo stock é obrigatório.' });
@@ -13,14 +25,23 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
   }
 
   try {
+    // Certifique-se de que o preço seja um número float
+    const parsedPrice = parseFloat(price);
+
+    // Verifica se o preço é um número válido
+    if (isNaN(parsedPrice)) {
+      res.status(400).json({ error: 'Preço inválido. O preço deve ser um número.' });
+      return;
+    }
+
     // Cria o novo produto
     const product = await prisma.product.create({
       data: {
         name,
         description,
-        price,
+        price: parsedPrice, // Usando o valor float para o preço
         stock,
-        userId, // Usando o userId para associar o produto ao usuário
+        userId: userId, // Usando o userId para associar o produto ao usuário
       },
     });
 
@@ -33,6 +54,11 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ error: 'Erro ao criar produto' });
   }
 };
+
+
+
+
+
 
 // Listar todos os produtos
 export const getAllProducts = async (req: Request, res: Response): Promise<void> => {
